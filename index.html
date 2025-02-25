@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snapchat Login</title>
-    <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <link rel="icon" href="data:,"> <!-- Fix for missing favicon -->
     <style>
         :root {
             --bg-color: #fffc00;
@@ -44,9 +42,16 @@
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             width: 320px;
-            transform: scale(0.9);
-            opacity: 0;
-            animation: fadeIn 0.6s ease-out forwards;
+        }
+        h2 {
+            margin-bottom: 15px;
+        }
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
         .login-btn {
             width: 100%;
@@ -57,79 +62,60 @@
             font-size: 16px;
             cursor: pointer;
             margin-top: 10px;
-            transition: background 0.3s, transform 0.2s;
+        }
+        .login-btn:hover {
+            background-color: var(--button-hover);
         }
         .google-btn {
             background-color: var(--google-bg);
             color: white;
         }
-        .toggle-mode {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 8px 12px;
-            border: none;
-            background: var(--button-bg);
-            border-radius: 5px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
-    <button class="toggle-mode" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+
     <div class="login-container">
-        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/c/c4/Snapchat_logo.svg/1920px-Snapchat_logo.svg.png" class="logo" alt="Snapchat Logo">
         <h2>Snapchat Login</h2>
-        <input type="text" id="username" class="input-field" placeholder="Username" required>
-        <input type="password" id="password" class="input-field" placeholder="Password" required>
+        <input type="text" id="username" class="input-field" placeholder="Username">
+        <input type="password" id="password" class="input-field" placeholder="Password">
         <button class="login-btn" onclick="saveCredentials()">Login</button>
         <button class="login-btn google-btn" onclick="authenticate()">Login with Google</button>
     </div>
-    <script>
-        let CLIENT_ID = "404742512626-36gu7pq72bgmdl1k5fq3r1cmqth76sak.apps.googleusercontent.com";
-        let SCOPES = "https://www.googleapis.com/auth/drive.file";
 
-        function ensureGoogleAuthLoaded(callback) {
-            if (typeof gapi !== "undefined" && gapi.auth && gapi.auth.getToken) {
-                callback();
-            } else {
-                setTimeout(() => ensureGoogleAuthLoaded(callback), 500);
-            }
-        }
+    <script>
+        let googleUser = null;
 
         function authenticate() {
-            gapi.load("client", () => {
-                gapi.client.init({
-                    clientId: CLIENT_ID,
-                    scope: SCOPES
-                }).then(() => {
-                    gapi.auth2.getAuthInstance().signIn().then(user => {
-                        alert("Signed in as " + user.getBasicProfile().getName());
-                    }).catch(error => console.error("Auth error:", error));
-                });
+            google.accounts.id.initialize({
+                client_id: "YOUR_CLIENT_ID",
+                callback: handleCredentialResponse
             });
+
+            google.accounts.id.prompt();
+        }
+
+        function handleCredentialResponse(response) {
+            console.log("Google Sign-In Response: ", response);
+            googleUser = response.credential;
         }
 
         function saveCredentials() {
-            ensureGoogleAuthLoaded(() => {
-                let token = gapi.auth.getToken();
-                if (!token) {
-                    alert("Please sign in with Google first!");
-                    return;
-                }
-                let username = document.getElementById("username").value;
-                let password = document.getElementById("password").value;
-                if (username === "" || password === "") {
-                    alert("Please enter both username and password.");
-                    return;
-                }
-                console.log("Credentials saved (but not uploaded for security reasons)");
-            });
-        }
+            if (!googleUser) {
+                alert("Please sign in with Google first!");
+                return;
+            }
 
-        function toggleDarkMode() {
-            document.body.classList.toggle("dark-mode");
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+
+            if (username === "" || password === "") {
+                alert("Please enter both username and password.");
+                return;
+            }
+
+            console.log("Credentials Saved:", { username, password });
         }
     </script>
+
 </body>
 </html>
